@@ -86,7 +86,7 @@ alternative one is not provided.  If you wish to provide a custom config
 session name, set this value.  Typically this value does not need to be
 changed.
 
-The default value is `ansible-{{ omit | to_uuid }}`
+The default value is `cfg-ansible`
 
 ### eos_config_checkpoint_filename
 
@@ -94,7 +94,7 @@ The name of the checkpoint file to be created on the local device is defined by
 this setting and does not typically need to be changed.   The checkpoint file
 is created on the default flash file system.
 
-The default value is `_tmp_ansible`
+The default value is `tmp_ansible`
 
 ### eos_rollback_enabled
 
@@ -102,15 +102,6 @@ By default, if an error is enountered while loading the configuration file, the
 function will automatically reload the previous active configuration.  This
 feature is enabled by default but can be disabled by setting this value to
 `False`.
-
-The default value is `True`
-
-### eos_clear_config_session
-
-Once the `load_config` function has completed executing, and (assuming
-configuration sessions are being used) the configuration session is removed to
-save memory.  If you do not want the configuration session removed, set this
-value to `False`.
 
 The default value is `True`
 

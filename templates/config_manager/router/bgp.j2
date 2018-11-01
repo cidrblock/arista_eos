@@ -1,0 +1,5 @@
+router bgp {{ item.bgp_as }}
+router-id {{ item.router_id | default(omit) }}
+maximum-paths {{ item.maximum_paths | default(omit) }}
+
+

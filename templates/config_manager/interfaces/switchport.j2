@@ -1,0 +1,11 @@
+{% if item.switchport is defined %}
+  {% if item.switchport.mode | default('access') == 'access' %}
+    {% if name[0:2].lower().startswith('et') %}
+      no ip address
+      switchport
+      switchport mode access
+      switchport access vlan {{ item.access_vlan | default(omit) }}
+    {% endif %}
+  {% elif item.switchport.mode | deafult('access') == 'trunk' %}
+  {% endif %}
+{% endif %}

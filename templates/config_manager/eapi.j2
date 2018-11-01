@@ -1,0 +1,41 @@
+{% if config.eapi is defined %}
+  {% if config.eapi.default | default(None) %}
+    default management api http-commands
+
+  {% else %}
+    {% if config.eapi.replace | default(False) %}
+      default management api http-commands
+    {% endif %}
+
+    management api http-commands
+
+    {% if config.eapi.http is defined %}
+      {{ config.eapi.http.enabled | default(None) | ternary('protocol http', 'no protocol http', omit) }}
+      {% if config.eapi.http.enabled | default(None) %}
+        protocol http port {{ config.eapi.http.port | default(omit) }}
+      {% endif %}
+    {% endif %}
+
+    {% if config.eapi.local is defined %}
+      {{ config.eapi.local.enabled | default(None) | ternary('protocol http localhost', 'no protocol http localhost', omit) }}
+      {% if config.eapi.local.enabled | default(None) %}
+        protocol http localhost port {{ config.eapi.local.port | default(omit) }}
+      {% endif %}
+    {% endif %}
+
+    {% if config.eapi.https is defined %}
+      {{ config.eapi.https.enabled | default(None) | ternary('protocol https', 'no protocol https', omit) }}
+      {% if config.eapi.https.enabled | default(None) %}
+        protocol https port {{ config.eapi.https.port | default(omit) }}
+      {% endif %}
+    {% endif %}
+
+    {% if config.eapi.socket is defined %}
+      {{ config.eapi.socket.enabled | default(None) | ternary('protocol unix-socket', 'no protocol unix-socket', omit) }}
+    {% endif %}
+
+    vrf {{ config.eapi.vrf | default(omit) }}
+    {{ config.eapi.enabled | default(None) | ternary('no shutdown', 'shutdown', omit) }}
+
+  {% endif %}
+{% endif %}

@@ -1,0 +1,24 @@
+{% for name, item in config.interfaces | default({}) | dictsort %}
+  {% if item.state | default('present') == 'absent' %}
+    {% if name.lower() not in ('et', 'ma') %}
+      no interface {{ name }}
+    {% endif %}
+
+  {% else %}
+    {{ item.replace | default(False) | ternary('default interface ' ~ name, '', '') }}
+
+    interface {{ name }}
+
+    description {{ item.description | default(omit) }}
+    mtu {{ item.mtu | default(omit) }}
+  
+    {% if item.routing | default(None) %}
+      {% include 'config_manager/interfaces/ipv4.j2' %}
+      {% include 'config_manager/interfaces/ipv6.j2' %}
+    {% elif item.routing | default(None) == False %}
+      {% include 'config_manager/interfaces/switchport.j2' %}
+    {% endif %}
+
+    {{ item.enabled | default(None) | ternary('no shutdown', 'shutdown', omit) }}
+  {% endif %}
+{% endfor %}

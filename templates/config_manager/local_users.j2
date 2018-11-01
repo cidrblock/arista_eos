@@ -1,0 +1,22 @@
+{% for item in config.local_users | default([]) %}
+  {{ lookup('validate', 'local_users_spec.yaml', item) }}
+
+  {% if item.state | default('present') == 'absent' %}
+    no username {{ item.name }}
+
+  {% elif item.state | default('present') == 'present' %}
+    {% if item.replace | default(None) %}
+      no username {{ item.name }}
+    {% endif %}
+
+    username {{ item.name }} secret {{ item.password | default(omit) }}
+
+    {% if item.nopassword | default(None) %}
+      username {{ item.name }} nopassword
+    {% endif %}
+
+    username {{ item.name }} role {{ item.role | default(omit) }}
+    username {{ item.name }} privilege {{ item.privilege | default(omit) }}
+    username {{ item.name }} sshkey {{ item.sshkey | default(omit) }}
+  {% endif %}
+{% endfor %}

@@ -1,0 +1,5 @@
+{% if config.router is defined %}
+  {% for key, item in config.router | default({}) | dictsort %}
+    {% include "config_manager/router/" ~ key ~ ".j2" %}
+  {% endfor %}
+{% endif %}

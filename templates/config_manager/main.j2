@@ -1,0 +1,7 @@
+#jinja2: lstrip_blocks: True
+
+{% set config = config_manager_vars %}
+
+{% for item in eos_template_includes %}
+  {% include 'templates/config_manager/' ~ item | basename %}
+{% endfor %}

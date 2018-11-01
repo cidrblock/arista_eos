@@ -1,0 +1,41 @@
+hostname {{ config.hostname | default(omit) }}
+
+ip domain-name {{ config.domain_name | default(omit) }}
+
+{% if config.lookup_source is defined %}
+  {% set lookup_source %}
+    ip domain lookup
+    vrf {{ config.lookup_source.vrf | default(omit) }}
+    source-interface {{ config.lookup_source.interface }}
+  {% endset %}
+  {{ lookup_source | join_lines }}
+{% endif %}
+
+{% for item in config.domain_list | default([]) %}
+  {% set state = item.state | default('present') %}
+  {% if state == 'present' %}
+    ip domain-list {{ item.domain }}
+  {% elif state == 'absent' %}
+    no ip domain-list {{ item.domain }}
+  {% endif %}
+{% endfor %}
+
+{% if config.routing is defined %}
+  {{ config.routing | ternary('ip routing', 'no ip routing') }}
+{% endif %}
+
+{% for item in config.name_servers | default([]) %}
+  {% set nameserver %}
+    ip name-server
+    vrf {{ item.vrf | default(omit) }}
+    {{ item.server }}
+  {% endset %}
+  {% if item.state | default('present') == 'absent' %}
+    {% set nameserver = 'no ' ~ nameserver.strip() %}
+  {% endif %}
+  {{ nameserver | join_lines }}
+{% endfor %}
+
+{% if config.lldp is defined %}
+  {{ config.lldp.enabled | default(None) | ternary('lldp run', 'no lldp run', omit) }}
+{% endif %}

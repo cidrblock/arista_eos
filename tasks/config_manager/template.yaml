@@ -1,0 +1,41 @@
+---
+- name: initialize function
+  include_tasks: "{{ role_path }}/includes/init.yaml"
+
+- name: initialize eos checkpoint file
+  block:
+    - name: set the checkpoint filename
+      set_fact:
+        eos_checkpoint_filename: "chk_ansible"
+
+    - name: create checkpoint file on remote device
+      include_tasks: "{{ role_path }}/includes/checkpoint/create.yaml"
+  when: eos_rollback_enabled
+
+- name: display message
+  debug:
+    msg: "eos configuration rollback is {{ eos_rollback_enabled | ternary('enabled', 'disabled') }}"
+
+- name: edit the target device configuration
+  block:
+    - name: load configuration using cli_config module
+      cli_config:
+        config: "{{ lookup('config_template', eos_config_template) | join('\n') }}"
+        replace: "{{ config_manager_replace | default(False) }}"
+      vars:
+        eos_config_template: "{{ role_path }}/templates/config_manager/main.j2"
+        eos_template_includes:
+          - global.j2
+
+  rescue:
+    - name: restore checkpoint file
+      include_tasks: "{{ role_path }}/includes/checkpoint/restore.yaml"
+      when: eos_rollback_enabled
+
+    - name: fail host
+      fail:
+        msg: error loading configuration onto target host
+
+- name: remove checkpoint file from remote device
+  include_tasks: "{{ role_path }}/includes/checkpoint/remove.yaml"
+  when: eos_rollback_enabled

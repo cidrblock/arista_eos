@@ -1,0 +1,12 @@
+{% if config.router.ospf.replace | default(None) %}
+  no router ospf {{ config.router.ospf.process_id }}
+{% endif %}
+
+{% if config.router.ospf.enabled | default(True) %}
+  router ospf {{ config.router.ospf.process_id }}
+  router-id {{ config.router.ospf.router_id | default(omit) }}
+
+  {% for item in config.router.ospf.networks | default([]) %}
+    network {{ item.prefix }} {{ item.wildcard }} area {{ item.area }}
+  {% endfor %}
+{% endif %}

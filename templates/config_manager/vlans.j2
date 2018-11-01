@@ -1,0 +1,9 @@
+{% for item in config.vlans | default([]) %}
+  {% if item.state | default('present') == 'absent' %}
+    no vlan {{ item.vlan_id }}
+  {% elif item.state | default('present') == 'present' %}
+    vlan {{ item.vlan_id }}
+    name {{ item.name | default(omit) }}
+    status {{ item.status | default(omit) }}
+  {% endif %}
+{% endfor %}

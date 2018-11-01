@@ -1,0 +1,11 @@
+{% if item.ipv4 is defined %}
+  {% if name[0:2].lower() in ('et', 'po') %}
+    no switchport
+  {% endif %}
+
+  {% if item.ipv4.dhcp | default(False) %}
+    ip address dhcp
+  {% else %}
+    ip address {{ item.ipv4.address }}/{{ item.ipv4.masklen }}
+  {% endif %}
+{% endif %}

@@ -1,0 +1,11 @@
+{% for name, item in config.vrf_definitions | default({}) | dictsort  %}
+  {% if item.state | default('present') == 'absent' %}
+    no vrf {{ name }}
+  {% elif item.state | default('absent') == 'present' %}
+    {% if item.replace | default(None) %}
+      no vrf {{ name }}
+    {% endif %}
+    vrf {{ name }}
+    rd {{ item.rd | default(omit) }}
+  {% endif %}
+{% endfor %}

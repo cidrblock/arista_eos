@@ -1,0 +1,12 @@
+{% for item in config.router.static | default([]) %}
+  {% if item.state | default('present') == 'absent' %}
+    no ip route {{ item.prefix }}
+
+  {% elif item.state |default('present') == 'present' %}
+    {% set route %}
+      ip route {{ item.prefix }} {{ item.next_hop }}
+      distance {{ item.admin_distance | default(omit) }}
+    {% endset %}
+    {{ route | join_lines }}
+  {% endif %}
+{% endfor %}
